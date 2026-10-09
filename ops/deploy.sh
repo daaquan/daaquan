@@ -86,20 +86,30 @@ PY
   sleep 1
 done
 test "$verified" = true
-notes_status=$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: daaquan.com' http://127.0.0.1/notes/ai-tools/)
-root_status=$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: daaquan.com' http://127.0.0.1/)
-notes_location=$(curl -s -D - -o /dev/null -H 'Host: daaquan.com' http://127.0.0.1/notes/ai-tools/ | awk 'tolower($1)=="location:" {print $2}' | tr -d '\r')
-root_location=$(curl -s -D - -o /dev/null -H 'Host: daaquan.com' http://127.0.0.1/ | awk 'tolower($1)=="location:" {print $2}' | tr -d '\r')
-test "$notes_status" = 301
-test "$root_status" = 302
-case "$notes_location" in
-  /ja/notes/ai-tools/|http://daaquan.com/ja/notes/ai-tools/|https://daaquan.com/ja/notes/ai-tools/) ;;
-  *) echo "Unexpected notes redirect: $notes_location" >&2; exit 1 ;;
-esac
-case "$root_location" in
-  /ja/|http://daaquan.com/ja/|https://daaquan.com/ja/) ;;
-  *) echo "Unexpected root redirect: $root_location" >&2; exit 1 ;;
-esac
+# The release symlink is visible to old workers before reload finishes.
+# Keep checking until the new redirect rules are actually serving.
+redirects_ok=false
+for attempt in 1 2 3 4 5 6 7 8; do
+  notes_status=$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: daaquan.com' http://127.0.0.1/notes/ai-tools/)
+  root_status=$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: daaquan.com' http://127.0.0.1/)
+  notes_location=$(curl -s -D - -o /dev/null -H 'Host: daaquan.com' http://127.0.0.1/notes/ai-tools/ | awk 'tolower($1)=="location:" {print $2}' | tr -d '\r')
+  root_location=$(curl -s -D - -o /dev/null -H 'Host: daaquan.com' http://127.0.0.1/ | awk 'tolower($1)=="location:" {print $2}' | tr -d '\r')
+  case "$notes_status $notes_location" in
+    "301 /ja/notes/ai-tools/"|"301 http://daaquan.com/ja/notes/ai-tools/"|"301 https://daaquan.com/ja/notes/ai-tools/")
+      case "$root_status $root_location" in
+        "302 /ja/"|"302 http://daaquan.com/ja/"|"302 https://daaquan.com/ja/") redirects_ok=true ;;
+      esac
+      ;;
+  esac
+  if [ "$redirects_ok" = true ]; then
+    break
+  fi
+  sleep 1
+done
+if [ "$redirects_ok" != true ]; then
+  printf 'Redirect check failed: notes=%s %s root=%s %s\n' "$notes_status" "$notes_location" "$root_status" "$root_location" >&2
+  exit 1
+fi
 trap - ERR
 rm -f "/tmp/daaquan-$release.tar.gz" "/tmp/daaquan-$release-check.json" "/tmp/daaquan-$release-redirects.conf"
 printf 'Deployed release: %s\n' "$release"
