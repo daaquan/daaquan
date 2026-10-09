@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-import { boardThreads, formatDay, lastActivity, latestReply, moves, replyCount, tagMeta, threadsByTag, usedTags, voiceById, voiceList, type Thread } from '@/lib/forum';
+import { formatDay, lastActivity, latestReply, moves, replyCount, tagMeta, threadsByTag, threadsFor, usedTags, voiceById, voiceList, type Thread } from '@/lib/forum';
+import { notesPath, tagPath, notePath, type Locale } from '@/lib/locales';
 
 function TopicRow({ thread }: { thread: Thread }) {
   const opener = voiceById(thread.voice);
@@ -8,7 +9,7 @@ function TopicRow({ thread }: { thread: Thread }) {
   const lastVoice = latest ? voiceById(latest.voice) : opener;
   return (
     <li>
-      <Link className="topic-row" href={`/notes/${thread.slug}/`} id={thread.legacyId} prefetch={false}>
+      <Link className="topic-row" href={notePath(thread.locale, thread.slug)} id={thread.legacyId} prefetch={false}>
         <span aria-hidden="true" className={`voice-mark hue-${opener.hue}`}>{opener.mark}</span>
         <div className="topic-copy">
           {thread.pinned || thread.sample ? <div className="topic-flags">{thread.pinned ? <Badge>固定</Badge> : null}{thread.sample ? <Badge variant="outline">サンプル</Badge> : null}</div> : null}
@@ -27,10 +28,10 @@ function TopicRow({ thread }: { thread: Thread }) {
   );
 }
 
-export function ForumBoard({ tag }: { tag?: string }) {
-  const topics = tag ? threadsByTag(tag) : boardThreads;
+export function ForumBoard({ locale, tag }: { locale: Locale; tag?: string }) {
+  const topics = tag ? threadsByTag(locale, tag) : threadsFor(locale);
   const current = tag ? tagMeta(tag) : null;
-  const tags = usedTags();
+  const tags = usedTags(locale);
   return (
     <>
       <header className="page-header forum-header">
@@ -39,8 +40,8 @@ export function ForumBoard({ tag }: { tag?: string }) {
         <p>{current ? current.blurb : '専門の住人が、読んだものに角度をつけて話す。要約、転用、自前、横から。名前のない感想は置かない。'}</p>
         <p className="forum-stats"><span>{topics.length} 話題</span><span>{replyCount(topics)} 返信</span><span>{voiceList.length} 人</span></p>
         <nav aria-label="話題のタグ" className="tag-rail">
-          <Link aria-current={tag ? undefined : 'page'} href="/notes/">すべて<span className="tag-count">{boardThreads.length}</span></Link>
-          {tags.map(item => <Link aria-current={item.slug === tag ? 'page' : undefined} href={`/notes/tag/${item.slug}/`} key={item.slug}>{item.label}<span className="tag-count">{item.count}</span></Link>)}
+          <Link aria-current={tag ? undefined : 'page'} href={notesPath(locale)}>すべて<span className="tag-count">{threadsFor(locale).length}</span></Link>
+          {tags.map(item => <Link aria-current={item.slug === tag ? 'page' : undefined} href={tagPath(locale, item.slug)} key={item.slug}>{item.label}<span className="tag-count">{item.count}</span></Link>)}
         </nav>
         {tag ? null : <ul aria-label="会議室の住人" className="resident-strip">{voiceList.map(voice => <li key={voice.id}><span aria-hidden="true" className={`voice-mark hue-${voice.hue}`}>{voice.mark}</span><span className="resident-copy"><strong>{voice.name}</strong><span>{voice.field}</span><span>{voice.line}</span></span></li>)}</ul>}
       </header>

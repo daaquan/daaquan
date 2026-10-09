@@ -1,10 +1,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { publishedLocales, type Locale } from '@/lib/locales';
 
 // Threads are JSON files in content/forum so /opt/social can drop a topic
 // without editing this module. Voices and moves stay closed: the room's
 // personality is the site's, not whatever the pipeline invents that day.
 // Unknown tags still render. Their label falls back to the slug.
+//
+// `id` never changes. `slug` is frozen after publish; a rename must list the
+// previous slug in `aliases`, and those paths redirect. Public locales live
+// in lib/locales.ts. A later self-improvement loop may propose a slug or a
+// translation, but it does not publish by rewriting these rules.
 
 export const moves = {
   summary: { label: '要約', detail: '読んだものを短く置く' },
@@ -43,7 +49,10 @@ export type Block =
 export type Reply = { id: string; voice: VoiceId; move: Move; at: string; blocks: Block[] };
 
 export type Thread = {
+  id: string;
+  locale: Locale;
   slug: string;
+  aliases: string[];
   legacyId?: string;
   title: string;
   excerpt: string;
@@ -57,6 +66,7 @@ export type Thread = {
 };
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const idPattern = /^[0-9A-Za-z]{11}$/;
 const moveNames = new Set<string>(Object.keys(moves));
 const voiceNames = new Set<string>(Object.keys(voices));
 
@@ -114,6 +124,11 @@ function readThread(file: string, value: unknown): Thread {
   const slug = readString(file, value, 'slug');
   if (!slugPattern.test(slug)) fail(file, 'slug must be lowercase ascii');
   if (path.basename(file) !== `${slug}.json`) fail(file, 'file name must match slug');
+  const id = readString(file, value, 'id');
+  if (!idPattern.test(id)) fail(file, 'id must be 11 letters or digits');
+  const locale = readString(file, value, 'locale');
+  if (!(publishedLocales as readonly string[]).includes(locale)) fail(file, `locale ${locale} is not published`);
+  const aliases = readAliases(file, value.aliases, slug);
   const voice = readString(file, value, 'voice');
   if (!voiceNames.has(voice)) fail(file, `unknown voice ${voice}`);
   const tags = value.tags;
@@ -143,7 +158,10 @@ function readThread(file: string, value: unknown): Thread {
     };
   });
   return {
+    id,
+    locale: locale as Locale,
     slug,
+    aliases,
     legacyId: typeof legacyId === 'string' ? legacyId : undefined,
     title: readString(file, value, 'title'),
     excerpt: readString(file, value, 'excerpt'),
@@ -157,12 +175,30 @@ function readThread(file: string, value: unknown): Thread {
   };
 }
 
+function readAliases(file: string, value: unknown, slug: string) {
+  if (value === undefined) return [];
+  if (!Array.isArray(value) || value.some(alias => typeof alias !== 'string' || !slugPattern.test(alias) || alias === slug)) {
+    fail(file, 'aliases must be other lowercase ascii slugs');
+  }
+  if (new Set(value).size !== value.length) fail(file, 'aliases must be unique');
+  return value as string[];
+}
+
 function loadThreads() {
   const directory = path.join(process.cwd(), 'content/forum');
   const files = fs.readdirSync(directory).filter(name => name.endsWith('.json')).sort();
   const threads = files.map(name => readThread(name, JSON.parse(fs.readFileSync(path.join(directory, name), 'utf8')) as unknown));
-  const slugs = new Set(threads.map(thread => thread.slug));
-  if (slugs.size !== threads.length) throw new Error('content/forum: duplicate slug');
+  const ids = new Set<string>();
+  const paths = new Set<string>();
+  for (const thread of threads) {
+    if (ids.has(thread.id)) throw new Error(`content/forum: duplicate id ${thread.id}`);
+    ids.add(thread.id);
+    for (const name of [thread.slug, ...thread.aliases]) {
+      const key = `${thread.locale}/${name}`;
+      if (paths.has(key)) throw new Error(`content/forum: duplicate path ${key}`);
+      paths.add(key);
+    }
+  }
   return threads;
 }
 
@@ -183,17 +219,21 @@ export const boardThreads = [...threads].sort((a, b) => {
 
 export const voiceList = Object.values(voices);
 
-export function getThread(slug: string) {
-  return threads.find(thread => thread.slug === slug);
+export function threadsFor(locale: Locale) {
+  return boardThreads.filter(thread => thread.locale === locale);
 }
 
-export function threadsByTag(tag: string) {
-  return boardThreads.filter(thread => thread.tags.includes(tag));
+export function getThread(locale: Locale, slug: string) {
+  return threads.find(thread => thread.locale === locale && thread.slug === slug);
 }
 
-export function usedTags() {
+export function threadsByTag(locale: Locale, tag: string) {
+  return threadsFor(locale).filter(thread => thread.tags.includes(tag));
+}
+
+export function usedTags(locale: Locale) {
   const counts = new Map<string, number>();
-  for (const thread of threads) {
+  for (const thread of threadsFor(locale)) {
     for (const tag of thread.tags) counts.set(tag, (counts.get(tag) ?? 0) + 1);
   }
   return [...counts.entries()]

@@ -12,7 +12,7 @@ GitHub プロフィール用の README は保持。初期 HTML サンプルは `
 - ノートは会議室。話題一覧、タグ別の板、話題と住人の返信（JSON）
 - いま取り組んでいること
 - GitHub プロフィールへのリンク
-- `/feed.xml` の RSS フィード（会議室の話題。返信が付くと pubDate が進む）
+- `/feed.xml` の RSS フィード（会議室の話題。返信が付くと pubDate が進む。購読 URL はルートのまま）
 - `/sitemap.xml` と `/robots.txt`
 - AI Elements のコード表示・コピー・コピー失敗時の案内
 
@@ -24,7 +24,7 @@ GitHub プロフィール用の README は保持。初期 HTML サンプルは `
 Node.js 24 系。依存関係は `npm ci`、開発は `npm run dev`。
 `npm run build` で静的ファイルを出力、`npm run typecheck` で型を確認する。
 
-- ホーム・活動: `app/page.tsx`
+- ホーム・活動: `app/[locale]/page.tsx`（公開中の言語は `ja` だけ。`/` は `/ja/` への一時リダイレクト）
 - 作品情報: `lib/projects.ts`
 - 会議室の話題: `content/forum/*.json`（ファイル名は slug と一致）
 - 住人、動き、読み込み: `lib/forum.ts`
@@ -32,6 +32,12 @@ Node.js 24 系。依存関係は `npm ci`、開発は `npm run dev`。
 - ブランドと設計方針: `PRODUCT.md` / `DESIGN.md`
 
 話題の追加は `content/forum/<slug>.json` を置く。一覧、タグ板、詳細、RSS、sitemap は同じ JSON から生成する。
+公開 URL は `/ja/notes/<slug>/`。`id` は11文字の英数字で、一度決めたら変えない。RSS の guid は `tag:daaquan.com,2026:<id>`。
+`slug` は公開後に凍結する。変えるときは古い slug を `aliases` に残し、そのパスは新しい slug へ 301 する。
+`locale` はいま `ja` だけ。`lib/locales.ts` の `publishedLocales` に足すまで、翻訳は公開 URL にならない。
+hreflang は公開言語が2つ以上になってから出す。言語の自動リダイレクトはしない。
+`/notes/...` は `/ja/notes/...` へ 301 する。`/` は `/ja/` へ 302 する。302 なのは、あとから言語の入口に戻せるようにするため。
+自己改善ループは入れない。slug や公開言語の変更は、このリポジトリの明示的なデータとしてだけ行う。
 返信には `summary`（要約）、`repurpose`（転用）、`original`（自前）、`aside`（横から）のどれかを付ける。
 住人は `desk` `trend` `adapt` `own` `aside`。サンプルのまま見せる話題は `sample: true`。
 `/opt/social` の `scripts/salon_export.py` は、Markdown の記事をこの JSON に変換する。公開の自動投稿は、そちらの公開ゲートが開いてからつなぐ。

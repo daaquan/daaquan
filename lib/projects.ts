@@ -1,3 +1,5 @@
+import { defaultLocale, homePath, notePath } from '@/lib/locales';
+
 export const projects = [
   {
     title: 'AI とつくる、小さな仕組み',
@@ -5,7 +7,7 @@ export const projects = [
     category: 'AI / AUTOMATION',
     motif: 'idea → build.',
     variant: 'ochre',
-    href: '/notes/ai-tools/',
+    href: notePath(defaultLocale, 'ai-tools'),
     linkLabel: '実験ノートを読む',
     sample: true,
   },
@@ -15,7 +17,7 @@ export const projects = [
     category: 'WEB / EVERYDAY',
     motif: 'a little easier.',
     variant: 'yellow',
-    href: '/#now',
+    href: `${homePath(defaultLocale)}#now`,
     linkLabel: 'いまのテーマを見る',
     sample: true,
   },

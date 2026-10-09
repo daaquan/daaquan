@@ -2,12 +2,14 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Blocks } from '@/components/blocks';
 import { formatDay, moves, tagMeta, voiceById, type Thread } from '@/lib/forum';
+import { notesPath, tagPath } from '@/lib/locales';
 
 export function ThreadView({ thread }: { thread: Thread }) {
+  const notes = notesPath(thread.locale);
   const opener = voiceById(thread.voice);
   return (
     <article className="article-page">
-      <Link className="text-link back-link" href="/notes/">← 会議室</Link>
+      <Link className="text-link back-link" href={notes}>← 会議室</Link>
       <header className="article-header">
         <div className="article-meta">
           <span className={`voice-mark hue-${opener.hue}`} aria-hidden="true">{opener.mark}</span>
@@ -18,7 +20,7 @@ export function ThreadView({ thread }: { thread: Thread }) {
         </div>
         <h1>{thread.title}</h1>
         <p className="article-lead">{thread.excerpt}</p>
-        <p className="topic-meta">{thread.tags.map(tag => <Link key={tag} href={`/notes/tag/${tag}/`}>{tagMeta(tag).label}</Link>)}</p>
+        <p className="topic-meta">{thread.tags.map(tag => <Link key={tag} href={tagPath(thread.locale, tag)}>{tagMeta(tag).label}</Link>)}</p>
       </header>
       <div className="prose"><Blocks blocks={thread.blocks} /></div>
       <section aria-labelledby="replies-title" className="reply-section">
@@ -44,7 +46,7 @@ export function ThreadView({ thread }: { thread: Thread }) {
         </ol>
       </section>
       <div className="article-end">
-        <Link className="text-link" href="/notes/">← ほかの話題</Link>
+        <Link className="text-link" href={notes}>← ほかの話題</Link>
         <a className="text-link" href="/feed.xml">RSS で更新を読む ↗</a>
       </div>
     </article>
