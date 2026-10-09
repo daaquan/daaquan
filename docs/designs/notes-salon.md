@@ -20,7 +20,7 @@ daaquan.com の `/notes` は、3本のサンプル MDX が並ぶ記事一覧だ�
 
 - 公開経路は今のまま。Cloudflare の先で tanuki の nginx が `/var/www/daaquan/current` を静的配信する。常駐の Node は置かない。
 - `/api/`、`/ws`、`/quant/`、`/updates/` の reverse proxy は触らない。
-- 既存 URL `/notes/ai-tools/` と、コードサンプルのコピー、RSS、sitemap は残す。
+- コードサンプルのコピー、RSS、sitemap は残す。URL は `docs/designs/url-locales.md` に移った。`/notes/ai-tools/` は `/ja/notes/ai-tools/` へ 301 する。
 - social の `public_categories` は空で、公開の自動投稿はまだ許可されていない。
 
 ## Premises
