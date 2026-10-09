@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>daaquan / Notes</title>
+    <link>https://daaquan.com/</link>
+    <description>技術と AI の実験ノート。初期掲載分はサンプル記事です。</description>
+    <language>ja</language>
+    <atom:link href="https://daaquan.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item><title>【サンプル】AI の新機能は「何が変わるか」から考える</title><link>https://daaquan.com/#note-ai</link><guid>https://daaquan.com/#note-ai</guid><description>一つの作業を選び、使う前と使った後を比べる。記事形式を確認するためのサンプルです。</description></item>
+    <item><title>【サンプル】小さくつくって、毎日使って、直していく</title><link>https://daaquan.com/#note-build</link><guid>https://daaquan.com/#note-build</guid><description>途中の判断や失敗も記録する、開発ログのサンプルです。</description></item>
+    <item><title>【サンプル】自分のホームページを、小さな拠点にする</title><link>https://daaquan.com/#note-site</link><guid>https://daaquan.com/#note-site</guid><description>作品、活動、技術のメモを一つの場所に集める。</description></item>
+  </channel>
+</rss>
