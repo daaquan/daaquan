@@ -4,18 +4,25 @@ import { Badge } from '@/components/ui/badge';
 import { SiteShell } from '@/components/site-shell';
 import { NoteList } from '@/components/note-list';
 import { projects } from '@/lib/projects';
+import { posts } from '@/lib/posts';
 
 export const metadata = { alternates: { canonical: '/' } };
 
 export default function HomePage() {
   return <SiteShell>
     <section className="hero" aria-labelledby="hero-title">
-      <p className="eyebrow">A PERSONAL WEBSITE</p>
+      <p className="eyebrow">PERSONAL WORKSPACE / DAAQUAN</p>
       <h1 id="hero-title">アイデアを、<br /><span>小さく動くものに。</span></h1>
       <p className="hero-description">つくったもの、いま取り組んでいること。<br />技術と AI を触りながら、日々の発見をここに集めます。</p>
       <div className="hero-actions"><Button asChild size="lg"><Link href="#work">つくったものを見る <span aria-hidden="true">↗</span></Link></Button><Button asChild size="lg" variant="ghost"><Link href="/notes/">ノートを読む <span aria-hidden="true">→</span></Link></Button></div>
       <p className="sample-notice">はじめの一歩。作品・記事・活動の掲載内容はサンプルです。</p>
     </section>
+    <nav className="workspace-grid" aria-label="コンテンツのショートカット">
+      <Link href="#work" className="workspace-card"><span className="eyebrow">WORK</span><strong>{String(projects.length).padStart(2, '0')}<span aria-hidden="true">↗</span></strong><span>つくったもの・展示サンプル</span></Link>
+      <Link href="/notes/" className="workspace-card"><span className="eyebrow">NOTES</span><strong>{String(posts.length).padStart(2, '0')}<span aria-hidden="true">↗</span></strong><span>考えたこと、試したこと</span></Link>
+      <Link href="#now" className="workspace-card"><span className="eyebrow">NOW</span><strong>進行中<span aria-hidden="true">↗</span></strong><span>いま、気になっていること</span></Link>
+      <a href="https://github.com/daaquan" className="workspace-card"><span className="eyebrow">ELSEWHERE</span><strong>GitHub<span aria-hidden="true">↗</span></strong><span>コードと試行錯誤</span></a>
+    </nav>
     <section id="work" className="content-section" aria-labelledby="work-title">
       <div className="section-heading"><div><p className="eyebrow">WORK</p><h2 id="work-title">つくったもの</h2></div><p>便利なもの。気になるもの。まずは、つくってみる。</p></div>
       <div className="work-grid">{projects.map(project => <article className="project" key={project.title}>

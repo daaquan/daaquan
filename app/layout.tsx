@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { types: { 'application/rss+xml': '/feed.xml' } },
   openGraph: { siteName: 'daaquan', locale: 'ja_JP', type: 'website' },
 };
-export const viewport: Viewport = { themeColor: '#faf7ec' };
+export const viewport: Viewport = { themeColor: '#fff4cc' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return <html lang="ja"><body><a className="skip-link" href="#main">本文へ移動</a>{children}</body></html>;
