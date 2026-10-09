@@ -9,10 +9,10 @@ GitHub プロフィール用の README は保持。初期 HTML サンプルは `
 ## 内容
 
 - 作品の展示（2件のサンプル）
-- 技術・AI・開発ログのノート（3件の MDX サンプル。記事一覧と記事詳細）
+- ノートは会議室。話題一覧、タグ別の板、話題と住人の返信（JSON）
 - いま取り組んでいること
 - GitHub プロフィールへのリンク
-- `/feed.xml` の RSS フィード（現在はサンプル記事）
+- `/feed.xml` の RSS フィード（会議室の話題。返信が付くと pubDate が進む）
 - `/sitemap.xml` と `/robots.txt`
 - AI Elements のコード表示・コピー・コピー失敗時の案内
 
@@ -26,15 +26,15 @@ Node.js 24 系。依存関係は `npm ci`、開発は `npm run dev`。
 
 - ホーム・活動: `app/page.tsx`
 - 作品情報: `lib/projects.ts`
-- 記事本文: `content/notes/*.mdx`
-- 記事のタイトル・説明・日付・分類: `lib/posts.ts`
-- 記事本文の import 対応: `lib/note-content.ts`
+- 会議室の話題: `content/forum/*.json`（ファイル名は slug と一致）
+- 住人、動き、読み込み: `lib/forum.ts`
 - 見た目: `app/globals.css`（shadcn/ui と共有する OKLCH テーマ）
 - ブランドと設計方針: `PRODUCT.md` / `DESIGN.md`
 
-記事追加時は MDX ファイルを作り、`lib/posts.ts` と `lib/note-content.ts` に登録。
-記事一覧、詳細ページの metadata、RSS、sitemap は共通の記事情報から生成する。
-実際の記事に置き換える際は `sample: false` にする。
+話題の追加は `content/forum/<slug>.json` を置く。一覧、タグ板、詳細、RSS、sitemap は同じ JSON から生成する。
+返信には `summary`（要約）、`repurpose`（転用）、`original`（自前）、`aside`（横から）のどれかを付ける。
+住人は `desk` `trend` `adapt` `own` `aside`。サンプルのまま見せる話題は `sample: true`。
+`/opt/social` の `scripts/salon_export.py` は、Markdown の記事をこの JSON に変換する。公開の自動投稿は、そちらの公開ゲートが開いてからつなぐ。
 作品の `sample` は展示サンプル表示に使用。現時点の作品はすべてサンプル。
 
 公開は `npm run deploy`。SSH の `tanuki` とパスワード不要の sudo が必要。

@@ -45,6 +45,19 @@ const path = require('node:path');
       await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
       const articleAccessibility = await page.evaluate(async () => (await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })).violations.map(v => ({ id: v.id, targets: v.nodes.map(n => n.target) })));
       assert.deepEqual(articleAccessibility, [], `article accessibility at ${width}`);
+      await page.goto(`${origin}/notes/`, { waitUntil: 'networkidle' });
+      assert.match(await page.locator('h1').innerText(), /会議室/);
+      assert.equal(await page.locator('.topic-row').count(), 5);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `notes overflow at ${width}`);
+      if (width === 1440 || width === 390) {
+        await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
+        const notesAccessibility = await page.evaluate(async () => (await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })).violations.map(v => ({ id: v.id, targets: v.nodes.map(n => n.target) })));
+        assert.deepEqual(notesAccessibility, [], `notes accessibility at ${width}`);
+      }
+      await page.goto(`${origin}/notes/tag/build/`, { waitUntil: 'networkidle' });
+      assert.match(await page.locator('h1').innerText(), /開発/);
+      assert.equal(await page.locator('.topic-row').count(), 1);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `tag overflow at ${width}`);
       await page.goto(`${origin}/`, { waitUntil: 'networkidle' });
       await page.evaluate(() => document.activeElement.blur());
       await page.screenshot({ path: `/tmp/daaquan-${width}.png`, fullPage: true });
@@ -67,7 +80,9 @@ const path = require('node:path');
       return { errors: doc.querySelectorAll('parsererror').length, links: [...doc.querySelectorAll('item link')].map(n => n.textContent) };
     }, await feed.text());
     assert.equal(feedData.errors, 0);
-    assert.equal(feedData.links.length, 3);
+    assert.equal(feedData.links.length, 5);
+    assert.ok(feedData.links.some(link => link.endsWith('/notes/ai-tools/')));
+    assert.ok(feedData.links.some(link => link.endsWith('/notes/angle-first/')));
     for (const link of feedData.links) {
       const url = new URL(link);
       const result = await page.goto(`${origin}${url.pathname}`, { waitUntil: 'networkidle' });

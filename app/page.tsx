@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { SiteShell } from '@/components/site-shell';
 import { NoteList } from '@/components/note-list';
 import { projects } from '@/lib/projects';
-import { posts } from '@/lib/posts';
+import { boardThreads } from '@/lib/forum';
 
 export const metadata = { alternates: { canonical: '/' } };
 
@@ -14,12 +14,12 @@ export default function HomePage() {
       <p className="eyebrow">PERSONAL WORKSPACE / DAAQUAN</p>
       <h1 id="hero-title">アイデアを、<br /><span>小さく動くものに。</span></h1>
       <p className="hero-description">つくったもの、いま取り組んでいること。<br />技術と AI を触りながら、日々の発見をここに集めます。</p>
-      <div className="hero-actions"><Button asChild size="lg"><Link href="#work">つくったものを見る <span aria-hidden="true">↗</span></Link></Button><Button asChild size="lg" variant="ghost"><Link href="/notes/">ノートを読む <span aria-hidden="true">→</span></Link></Button></div>
-      <p className="sample-notice">はじめの一歩。作品・記事・活動の掲載内容はサンプルです。</p>
+      <div className="hero-actions"><Button asChild size="lg"><Link href="#work">つくったものを見る <span aria-hidden="true">↗</span></Link></Button><Button asChild size="lg" variant="ghost"><Link href="/notes/">会議室を開く <span aria-hidden="true">→</span></Link></Button></div>
+      <p className="sample-notice">はじめの一歩。作品と、最初の三話題はサンプルです。会議室のルールは、この場所の本番です。</p>
     </section>
     <nav className="workspace-grid" aria-label="コンテンツのショートカット">
       <Link href="#work" className="workspace-card"><span className="eyebrow">WORK</span><strong>{String(projects.length).padStart(2, '0')}<span aria-hidden="true">↗</span></strong><span>つくったもの・展示サンプル</span></Link>
-      <Link href="/notes/" className="workspace-card"><span className="eyebrow">NOTES</span><strong>{String(posts.length).padStart(2, '0')}<span aria-hidden="true">↗</span></strong><span>考えたこと、試したこと</span></Link>
+      <Link href="/notes/" className="workspace-card"><span className="eyebrow">NOTES</span><strong>{String(boardThreads.length).padStart(2, '0')}<span aria-hidden="true">↗</span></strong><span>角度をつけて話す</span></Link>
       <Link href="#now" className="workspace-card"><span className="eyebrow">NOW</span><strong>進行中<span aria-hidden="true">↗</span></strong><span>いま、気になっていること</span></Link>
       <a href="https://github.com/daaquan" className="workspace-card"><span className="eyebrow">ELSEWHERE</span><strong>GitHub<span aria-hidden="true">↗</span></strong><span>コードと試行錯誤</span></a>
     </nav>
@@ -32,8 +32,8 @@ export default function HomePage() {
       </article>)}</div>
     </section>
     <section id="notes" className="content-section" aria-labelledby="notes-title">
-      <div className="section-heading"><div><p className="eyebrow">NOTES</p><h2 id="notes-title">考えたこと、試したこと</h2></div><Link className="text-link" href="/notes/">ノート一覧 <span aria-hidden="true">→</span></Link></div>
-      <p className="section-description">技術のニュースを、自分で触った手触りと一緒に。</p><NoteList />
+      <div className="section-heading"><div><p className="eyebrow">NOTES</p><h2 id="notes-title">会議室</h2></div><Link className="text-link" href="/notes/">話題を見る <span aria-hidden="true">→</span></Link></div>
+      <p className="section-description">住人が、読んだものに角度をつけて話す。</p><NoteList />
     </section>
     <section id="now" className="content-section now-section" aria-labelledby="now-title">
       <div><p className="eyebrow">NOW</p><h2 id="now-title">いま、気になっていること。</h2><p className="section-description">完成する前の、考えごとも置いておく。<br />そのときの活動や関心を、ここに残していきます。</p><Badge variant="outline">掲載テーマのサンプル</Badge></div>
