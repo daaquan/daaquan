@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { publishedLocales, type Locale } from '@/lib/locales';
+import { copy } from '@/lib/copy';
+import { defaultLocale, publishedLocales, type Locale } from '@/lib/locales';
 
 // Threads are JSON files in content/forum so /opt/social can drop a topic
 // without editing this module. Voices and moves stay closed: the room's
@@ -26,15 +27,6 @@ export const voices = {
   own: { id: 'own', name: '自前', field: '着想', mark: '自', hue: 'pink', line: '借り物で終わらせず、題を立てる。' },
   aside: { id: 'aside', name: '横槍', field: '角度', mark: '横', hue: 'violet', line: '隣の話題に、別の側から入る。' },
 } as const;
-
-const tagCopy: Record<string, { label: string; blurb: string }> = {
-  ai: { label: 'AI', blurb: '新しい機能を、一つの作業に落として話す。' },
-  build: { label: '開発', blurb: '小さくつくって、直した記録を残す。' },
-  days: { label: '日々', blurb: 'このサイトを、興味の近い人の拠点にする。' },
-  room: { label: '会議室', blurb: '動きを名乗ってから書く。それがこの板のルールだ。' },
-  tools: { label: '道具', blurb: '手で触った道具と、その手触り。' },
-  trend: { label: '潮流', blurb: '見出しだけでは話題にしない。読んでから置く。' },
-};
 
 export type Move = keyof typeof moves;
 export type VoiceId = keyof typeof voices;
@@ -127,7 +119,7 @@ function readThread(file: string, value: unknown): Thread {
   const id = readString(file, value, 'id');
   if (!idPattern.test(id)) fail(file, 'id must be 11 letters or digits');
   const locale = readString(file, value, 'locale');
-  if (!(publishedLocales as readonly string[]).includes(locale)) fail(file, `locale ${locale} is not published`);
+  if (locale !== defaultLocale) fail(file, 'source threads stay in the default locale');
   const aliases = readAliases(file, value.aliases, slug);
   const voice = readString(file, value, 'voice');
   if (!voiceNames.has(voice)) fail(file, `unknown voice ${voice}`);
@@ -199,8 +191,54 @@ function loadThreads() {
       paths.add(key);
     }
   }
+  loadOverlays(threads);
   return threads;
 }
+
+function readOverlayBlocks(file: string, value: unknown, source: Block[]): Block[] {
+  if (!Array.isArray(value) || value.length !== source.length) fail(file, 'blocks must match the source');
+  return value.map((block, index) => {
+    const origin = source[index];
+    if (!isRecord(block) || block.type !== origin.type) fail(file, `block ${index} must stay ${origin.type}`);
+    if (origin.type === 'code') {
+      if (Object.keys(block).length !== 1) fail(file, 'code blocks stay in the source');
+      return origin;
+    }
+    if (origin.type === 'p' || origin.type === 'h2') return { type: origin.type, text: readString(file, block, 'text') };
+    const items = block.items;
+    if (!Array.isArray(items) || items.length !== origin.items.length || items.some(item => typeof item !== 'string' || item.trim() === '')) {
+      fail(file, `list at block ${index} must match the source`);
+    }
+    return { type: 'ul', items: items as string[] };
+  });
+}
+
+function loadOverlays(threads: Thread[]) {
+  const slugs = new Set(threads.map(thread => thread.slug));
+  for (const locale of publishedLocales) {
+    if (locale === defaultLocale) continue;
+    const file = `content/i18n/${locale}.json`;
+    const full = path.join(process.cwd(), file);
+    const value = JSON.parse(fs.readFileSync(full, 'utf8')) as unknown;
+    if (!isRecord(value)) fail(file, 'overlay must be an object');
+    const keys = Object.keys(value);
+    if (keys.length !== slugs.size || keys.some(key => !slugs.has(key))) fail(file, 'slugs must match the source threads');
+    for (const thread of threads) {
+      const entry = value[thread.slug];
+      if (!isRecord(entry) || !isRecord(entry.replies)) fail(file, `${thread.slug} needs title, blocks, and replies`);
+      const replyIds = thread.replies.map(reply => reply.id);
+      const overlayIds = Object.keys(entry.replies);
+      if (overlayIds.length !== replyIds.length || overlayIds.some(id => !replyIds.includes(id))) fail(file, `${thread.slug} reply ids must match`);
+      readOverlayBlocks(file, entry.blocks, thread.blocks);
+      readString(file, entry, 'title');
+      readString(file, entry, 'excerpt');
+      for (const reply of thread.replies) readOverlayBlocks(`${file}#${reply.id}`, entry.replies[reply.id], reply.blocks);
+    }
+    overlays.set(locale, value);
+  }
+}
+
+const overlays = new Map<Locale, Record<string, unknown>>();
 
 export function lastActivity(thread: Thread) {
   return thread.replies.reduce((latest, reply) => (reply.at > latest ? reply.at : latest), thread.created);
@@ -219,12 +257,37 @@ export const boardThreads = [...threads].sort((a, b) => {
 
 export const voiceList = Object.values(voices);
 
+const localized = new Map<string, Thread>();
+
+function localize(thread: Thread, locale: Locale): Thread {
+  if (locale === defaultLocale) return thread;
+  const key = `${locale}/${thread.id}`;
+  const cached = localized.get(key);
+  if (cached) return cached;
+  const file = `content/i18n/${locale}.json`;
+  const table = overlays.get(locale);
+  const entry = table?.[thread.slug];
+  const replies = isRecord(entry) ? entry.replies : undefined;
+  if (!isRecord(entry) || !isRecord(replies)) fail(file, `missing ${thread.slug}`);
+  const next: Thread = {
+    ...thread,
+    locale,
+    title: readString(file, entry, 'title'),
+    excerpt: readString(file, entry, 'excerpt'),
+    blocks: readOverlayBlocks(file, entry.blocks, thread.blocks),
+    replies: thread.replies.map(reply => ({ ...reply, blocks: readOverlayBlocks(file, replies[reply.id], reply.blocks) })),
+  };
+  localized.set(key, next);
+  return next;
+}
+
 export function threadsFor(locale: Locale) {
-  return boardThreads.filter(thread => thread.locale === locale);
+  return boardThreads.map(thread => localize(thread, locale));
 }
 
 export function getThread(locale: Locale, slug: string) {
-  return threads.find(thread => thread.locale === locale && thread.slug === slug);
+  const thread = threads.find(item => item.slug === slug);
+  return thread ? localize(thread, locale) : undefined;
 }
 
 export function threadsByTag(locale: Locale, tag: string) {
@@ -237,22 +300,38 @@ export function usedTags(locale: Locale) {
     for (const tag of thread.tags) counts.set(tag, (counts.get(tag) ?? 0) + 1);
   }
   return [...counts.entries()]
-    .map(([slug, count]) => ({ slug, count, ...tagMeta(slug) }))
+    .map(([slug, count]) => ({ slug, count, ...tagMeta(locale, slug) }))
     .sort((a, b) => b.count - a.count || a.slug.localeCompare(b.slug));
 }
 
-export function tagMeta(slug: string) {
-  return tagCopy[slug] ?? { label: slug, blurb: `${slug} の話題。` };
+export function tagMeta(locale: Locale, slug: string) {
+  const tags = copy[locale].tags;
+  if (Object.hasOwn(tags, slug)) return tags[slug as keyof typeof tags];
+  return { label: slug, blurb: copy[locale].unknownTag(slug) };
 }
 
-export function voiceById(id: VoiceId) {
-  return voices[id];
+export function moveMeta(locale: Locale, move: Move) {
+  return copy[locale].moves[move];
 }
 
-const dayFormat = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' });
+export function voiceById(locale: Locale, id: VoiceId) {
+  const base = voices[id];
+  const text = copy[locale].voices[id];
+  return { ...base, name: text.name, field: text.field, line: text.line };
+}
 
-export function formatDay(iso: string) {
-  const parts = dayFormat.formatToParts(new Date(iso));
+export function voiceListFor(locale: Locale) {
+  return voiceList.map(voice => voiceById(locale, voice.id));
+}
+
+const dayFormats: Record<Locale, Intl.DateTimeFormat> = {
+  ja: new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }),
+  en: new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }),
+  zh: new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }),
+};
+
+export function formatDay(iso: string, locale: Locale = defaultLocale) {
+  const parts = dayFormats[locale].formatToParts(new Date(iso));
   const part = (type: Intl.DateTimeFormatPartTypes) => parts.find(item => item.type === type)?.value ?? '';
   return `${part('year')}.${part('month')}.${part('day')}`;
 }

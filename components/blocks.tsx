@@ -1,6 +1,8 @@
 import type { BundledLanguage } from 'shiki';
 import { ArticleCode } from '@/components/article-code';
+import { copy } from '@/lib/copy';
 import type { Block } from '@/lib/forum';
+import type { Locale } from '@/lib/locales';
 
 function safeHref(href: string) {
   if (href.startsWith('/') && !href.startsWith('//')) return href;
@@ -25,11 +27,12 @@ export function RichText({ text }: { text: string }) {
   });
 }
 
-export function Blocks({ blocks }: { blocks: Block[] }) {
+export function Blocks({ blocks, locale }: { blocks: Block[]; locale: Locale }) {
+  const labels = { copy: copy[locale].copy, copied: copy[locale].copied, failed: copy[locale].copyFailed };
   return blocks.map((block, index) => {
     if (block.type === 'p') return <p key={index}><RichText text={block.text} /></p>;
     if (block.type === 'h2') return <h2 key={index}>{block.text}</h2>;
     if (block.type === 'ul') return <ul key={index}>{block.items.map(item => <li key={item}><RichText text={item} /></li>)}</ul>;
-    return <ArticleCode key={index} code={block.code} filename={block.filename} language={block.language as BundledLanguage} />;
+    return <ArticleCode key={index} code={block.code} filename={block.filename} labels={labels} language={block.language as BundledLanguage} />;
   });
 }

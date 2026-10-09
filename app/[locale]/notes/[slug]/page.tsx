@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: thread.title,
     description: thread.excerpt,
-    alternates: pageAlternates(notePath(locale, thread.slug)),
+    alternates: pageAlternates(locale, item => notePath(item, thread.slug)),
     openGraph: { title: thread.title, description: thread.excerpt, type: 'article', publishedTime: thread.created },
   };
 }
@@ -29,5 +29,5 @@ export default async function NotePage({ params }: { params: Promise<{ locale: s
   if (!isLocale(locale)) notFound();
   const thread = getThread(locale, slug);
   if (!thread) notFound();
-  return <SiteShell locale={locale} active="notes"><ThreadView thread={thread} /></SiteShell>;
+  return <SiteShell locale={locale} active="notes" switchPath={item => notePath(item, thread.slug)}><ThreadView thread={thread} /></SiteShell>;
 }

@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { homePath, pageAlternates } from '@/lib/locales';
+import { homePath } from '@/lib/locales';
 
 const home = homePath('ja');
 
 export const metadata: Metadata = {
-  alternates: pageAlternates(home),
+  alternates: { canonical: home },
   robots: { index: false, follow: true },
 };
 

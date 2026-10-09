@@ -81,7 +81,7 @@ function stampLang() {
       }
       if (!entry.name.endsWith('.html')) continue;
       const locale = path.relative(out, full).split(path.sep)[0];
-      if (locale !== 'ja' && locale !== 'en') continue;
+      if (locale !== 'ja' && locale !== 'en' && locale !== 'zh') continue;
       const html = fs.readFileSync(full, 'utf8').replace(/<html lang="[^"]*"/, `<html lang="${locale}"`);
       fs.writeFileSync(full, html);
     }

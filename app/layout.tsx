@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: '#fff4cc' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="ja"><body><a className="skip-link" href="#main">本文へ移動</a>{children}</body></html>;
+  return <html lang="ja"><body>{children}</body></html>;
 }

@@ -1,24 +1,18 @@
-import { defaultLocale, homePath, notePath } from '@/lib/locales';
-
 export const projects = [
   {
-    title: 'AI とつくる、小さな仕組み',
-    description: '繰り返す作業を少し楽に。AI ワークフローやツールの実験を展示する場所。',
+    key: 'automation',
     category: 'AI / AUTOMATION',
     motif: 'idea → build.',
     variant: 'ochre',
-    href: notePath(defaultLocale, 'ai-tools'),
-    linkLabel: '実験ノートを読む',
+    target: { kind: 'note', slug: 'ai-tools' },
     sample: true,
   },
   {
-    title: '暮らしのための道具',
-    description: 'タスクやメモを、もっと自然に。日常の小さな不便から生まれるもの。',
+    key: 'everyday',
     category: 'WEB / EVERYDAY',
     motif: 'a little easier.',
     variant: 'yellow',
-    href: `${homePath(defaultLocale)}#now`,
-    linkLabel: 'いまのテーマを見る',
+    target: { kind: 'now' },
     sample: true,
   },
 ] as const;

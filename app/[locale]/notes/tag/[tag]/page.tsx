@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ForumBoard } from '@/components/forum-board';
 import { SiteShell } from '@/components/site-shell';
+import { copy } from '@/lib/copy';
 import { tagMeta, threadsByTag, usedTags } from '@/lib/forum';
 import { isLocale, pageAlternates, publishedLocales, tagPath } from '@/lib/locales';
 
@@ -15,16 +16,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale, tag } = await params;
   if (!isLocale(locale)) return {};
   if (threadsByTag(locale, tag).length === 0) return {};
-  const meta = tagMeta(tag);
+  const meta = tagMeta(locale, tag);
   return {
-    title: `${meta.label} の話題`,
+    title: copy[locale].tagTitle(meta.label),
     description: meta.blurb,
-    alternates: pageAlternates(tagPath(locale, tag)),
+    alternates: pageAlternates(locale, item => tagPath(item, tag)),
   };
 }
 
 export default async function TagPage({ params }: { params: Promise<{ locale: string; tag: string }> }) {
   const { locale, tag } = await params;
   if (!isLocale(locale) || threadsByTag(locale, tag).length === 0) notFound();
-  return <SiteShell locale={locale} active="notes"><ForumBoard locale={locale} tag={tag} /></SiteShell>;
+  return <SiteShell locale={locale} active="notes" switchPath={item => tagPath(item, tag)}><ForumBoard locale={locale} tag={tag} /></SiteShell>;
 }

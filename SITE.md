@@ -24,7 +24,9 @@ GitHub プロフィール用の README は保持。初期 HTML サンプルは `
 Node.js 24 系。依存関係は `npm ci`、開発は `npm run dev`。
 `npm run build` で静的ファイルを出力、`npm run typecheck` で型を確認する。
 
-- ホーム・活動: `app/[locale]/page.tsx`（公開中の言語は `ja` だけ。`/` は `/ja/` への一時リダイレクト）
+- ホーム・活動: `app/[locale]/page.tsx`（公開中の言語は `ja` `en` `zh`。`/` は `/ja/` への一時リダイレクト）
+- UI の文言: `lib/copy.ts`
+- 記事の英訳・中訳: `content/i18n/en.json` と `content/i18n/zh.json`（本文の型と返信 id は日本語の原稿に合わせる。コードはそのまま）
 - 作品情報: `lib/projects.ts`
 - 会議室の話題: `content/forum/*.json`（ファイル名は slug と一致）
 - 住人、動き、読み込み: `lib/forum.ts`
@@ -32,10 +34,10 @@ Node.js 24 系。依存関係は `npm ci`、開発は `npm run dev`。
 - ブランドと設計方針: `PRODUCT.md` / `DESIGN.md`
 
 話題の追加は `content/forum/<slug>.json` を置く。一覧、タグ板、詳細、RSS、sitemap は同じ JSON から生成する。
-公開 URL は `/ja/notes/<slug>/`。`id` は11文字の英数字で、一度決めたら変えない。RSS の guid は `tag:daaquan.com,2026:<id>`。
+公開 URL は `/ja/notes/<slug>/`、`/en/notes/<slug>/`、`/zh/notes/<slug>/`。slug は言語で分けない。`id` は11文字の英数字で、一度決めたら変えない。RSS の guid は `tag:daaquan.com,2026:<id>`。
 `slug` は公開後に凍結する。変えるときは古い slug を `aliases` に残し、そのパスは新しい slug へ 301 する。
-`locale` はいま `ja` だけ。`lib/locales.ts` の `publishedLocales` に足すまで、翻訳は公開 URL にならない。
-hreflang は公開言語が2つ以上になってから出す。言語の自動リダイレクトはしない。
+`publishedLocales` は `ja` `en` `zh`。ここに無い言語は URL にならない。
+hreflang は公開中の言語と `x-default`（日本語）を相互に出す。言語の自動リダイレクトはしない。フッターの言語切替は、同じページの別言語への通常のリンク。表示名は 日本語 / English / 中文 のまま。
 `/notes/...` は `/ja/notes/...` へ 301 する。`/` は `/ja/` へ 302 する。302 なのは、あとから言語の入口に戻せるようにするため。
 自己改善ループは入れない。slug や公開言語の変更は、このリポジトリの明示的なデータとしてだけ行う。
 返信には `summary`（要約）、`repurpose`（転用）、`original`（自前）、`aside`（横から）のどれかを付ける。

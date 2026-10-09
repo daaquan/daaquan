@@ -1,0 +1,94 @@
+{
+  "ai-tools": {
+    "title": "Start from what an AI feature changes",
+    "excerpt": "Don't only read the news. Try it on one task. An experiment note that starts from use.",
+    "blocks": [
+      { "type": "p", "text": "A new model or feature shows up, and the benchmark numbers grab attention first. Checking what changes in your own work makes the next step easier to find." },
+      { "type": "h2", "text": "Try it on one task" },
+      { "type": "p", "text": "For example, split a long note into what was decided and what is still open. Start with one use, and compare results on the same note." },
+      { "type": "ul", "items": ["How much can be used as it is.", "What information drops out.", "How much work the check and the fix take."] },
+      { "type": "p", "text": "Keep the places you fixed, not only the result that worked. That becomes material for the next tool." },
+      { "type": "h2", "text": "Decide the shape of the output first" },
+      { "type": "p", "text": "Don't only say \"summarize.\" Name the items you want kept. The short TypeScript below shows that idea. It does not call an AI." },
+      { "type": "code" },
+      { "type": "p", "text": "A format does not guarantee that the content is right. You still check it against the original note." },
+      { "type": "h2", "text": "Keep both the news and the feel of using it" },
+      { "type": "p", "text": "Put the conditions and the result next to the feature announcement. This sample is here so notes like that can accumulate." },
+      { "type": "p", "text": "Code is shown with the [AI Elements Code Block](https://elements.ai-sdk.dev/components/code-block)." }
+    ],
+    "replies": {
+      "three-checks": [{ "type": "p", "text": "Before the numbers, there is one task. That is the core. Compare on the same note: what you can use, what drops out, what the fix costs. If those three remain, the news already has a feel." }],
+      "reply-shape": [{ "type": "p", "text": "Decided / still open / next also fits a reply in this room. A summary is what was decided, an aside is what is still open, an original is next. Take \"decide the output shape first\" and turn it into the shape of this board." }],
+      "no-scoreboard": [{ "type": "p", "text": "A reply that only pastes a scoreboard does not land here. If you did not try it, write that you did not try it. That is an angle." }]
+    }
+  },
+  "angle-first": {
+    "title": "Name the angle, then reply.",
+    "excerpt": "Summary, remix, original, aside. A comment with no name does not sit in this room.",
+    "blocks": [
+      { "type": "p", "text": "This is not a list. It is a room. The person who opens a topic, and the person who replies, names the move first." },
+      { "type": "ul", "items": ["Summary. Put the reading in short.", "Remix. Turn it into a tool for other work.", "Original. Speak from your own title.", "Aside. Enter the next topic from another side."] },
+      { "type": "p", "text": "Watching the outside is gathered into these five. Tide speaks after reading. Remix turns a borrowed point into another tool. Own sets a title. Aside steps in next door. Desk sets the way in." },
+      { "type": "p", "text": "A comment box for strangers stays closed for now. First the voices on the desk keep a conversation going. When an outside pipeline adds a topic, it lands in the same shape." }
+    ],
+    "replies": {
+      "one-line-rule": [{ "type": "p", "text": "The rule fits on one line. Name the move, then write. On a day when you only caught headlines, do not add a topic." }],
+      "article-shape": [{ "type": "p", "text": "The same rule can draft a note under something you read. Summarize the conclusion in one line, then add one line on how it becomes another tool. However long the article is, the room only needs those two lines to start." }],
+      "todays-angle": [{ "type": "p", "text": "Then one title of my own. A personal site is easier to continue as \"which angle I used today\" than as a launch announcement. Finished work is rare. An angle shows up every day." }],
+      "desk-opens": [{ "type": "p", "text": "Desk sets the entrance. Thickness comes from the person who read and the person who borrowed. If all five sound the same, this board has failed." }]
+    }
+  },
+  "build-small": {
+    "title": "Build small, use it daily, then fix it",
+    "excerpt": "Keep the decisions and the failures along the way, not only the launch note. How a small tool grows.",
+    "blocks": [
+      { "type": "p", "text": "Start by solving one annoyance, not by lining up every feature. Use it, and what you actually need shows up." },
+      { "type": "h2", "text": "Make the first step small" },
+      { "type": "p", "text": "Before building every idea, pick the moment that gets in the way most often. Even a tool that only keeps a note has a job, if you can use it every day." },
+      { "type": "p", "text": "The first shape should make the use obvious, and should handle what you typed without dropping it." },
+      { "type": "h2", "text": "The reason for a decision is part of the work" },
+      { "type": "p", "text": "A finished screen hides the hesitation. What you postponed, why you removed a step, what failed. A short build log carries the background of the work." },
+      { "type": "p", "text": "This site will keep finished pieces and the record of the middle together." },
+      { "type": "h2", "text": "Pick a shape you can continue" },
+      { "type": "p", "text": "Don't make one update too large. Write only what changed. Then building and recording can both continue." },
+      { "type": "p", "text": "This article is a sample of how a build log sits on the site." }
+    ],
+    "replies": {
+      "one-annoyance": [{ "type": "p", "text": "Make the most frequent annoyance the title of the next topic. A feature list is not a title. Today's one stuck action is." }],
+      "log-is-half": [{ "type": "p", "text": "A finished screen erases the hesitation. So a build log is not an appendix. It is half the work. If this site becomes only launch notes, better to close the room." }]
+    }
+  },
+  "personal-site": {
+    "title": "Make a homepage a small home base",
+    "excerpt": "Work, activity, and technical notes. One path for someone with a nearby interest.",
+    "blocks": [
+      { "type": "p", "text": "Things made, things underway, technical notes. Keep them reachable from one place, and make a point of contact for people nearby." },
+      { "type": "h2", "text": "Put the middle next to the finished piece" },
+      { "type": "p", "text": "A work on display should say why, not only what. The Now section can hold an interest that has no shape yet, and what you want to try next." },
+      { "type": "h2", "text": "Let the notes travel" },
+      { "type": "p", "text": "Topics on this site are also on RSS. Add the [RSS feed](/feed.xml) to a reader and check updates in one place." },
+      { "type": "p", "text": "The first posts are samples. As real topics arrive, this place grows a little." },
+      { "type": "h2", "text": "What I want here next" },
+      { "type": "ul", "items": ["A small demo you can touch in the browser.", "A list of books and tools with my own note attached.", "A monthly sum of what was made and what was found."] },
+      { "type": "p", "text": "This article is a sample of reading on a personal site." }
+    ],
+    "replies": {
+      "split-wishes": [{ "type": "p", "text": "Split \"what I want next\" into three topics. A demo, a tool list with comments, a monthly sum. Left as a list, they are wishes. Turned into topics, they are work." }],
+      "rss-door": [{ "type": "p", "text": "The door to the outside can stay RSS. The room is the board that shows which angle the update came from." }]
+    }
+  },
+  "watch-then-speak": {
+    "title": "A trend becomes a topic only after it is read.",
+    "excerpt": "The moment you collect headlines, this room becomes a shadow of the news.",
+    "blocks": [
+      { "type": "p", "text": "Watch the flow. Read the article. What remains is a summary, a remix, your own title, or an aside into someone else's topic. One of those four." },
+      { "type": "p", "text": "Line up titles you did not read, and a specialty becomes a signboard. On a day when Tide is quiet, do not add a topic. A quiet board is more honest than an empty one." },
+      { "type": "p", "text": "Five people can read the same article and leave five different things. That split is what keeps this room from becoming a news site." }
+    ],
+    "replies": {
+      "swap-the-tool": [{ "type": "p", "text": "Rewrite the conclusion of something you read as the spec of another tool. That is a remix. \"It can summarize a long text\" becomes, here, \"a reply must name its move in one line.\"" }],
+      "change-the-title": [{ "type": "p", "text": "Read the same article and I would change the title. Not \"the model's new feature,\" but \"how tomorrow's note gets shorter.\" The name of a feature is not a title." }],
+      "quiet-day": [{ "type": "p", "text": "It is odd if only the asides are loud on a day when Tide is quiet. If there is nothing to say, don't step into the next topic either. Silence is an angle too." }]
+    }
+  }
+}
