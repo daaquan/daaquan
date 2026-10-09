@@ -15,17 +15,17 @@ function nginxBlock(topics) {
   const aliases = [];
   for (const topic of topics) {
     for (const alias of topic.aliases ?? []) {
-      aliases.push(`    rewrite ^/${topic.locale}/notes/${alias}/?$ /${topic.locale}/notes/${topic.slug}/ permanent;`);
-      aliases.push(`    rewrite ^/notes/${alias}/?$ /${topic.locale}/notes/${topic.slug}/ permanent;`);
+      aliases.push(`    rewrite ^/${topic.locale}/notes/${alias}/?$ https://daaquan.com/${topic.locale}/notes/${topic.slug}/ permanent;`);
+      aliases.push(`    rewrite ^/notes/${alias}/?$ https://daaquan.com/${topic.locale}/notes/${topic.slug}/ permanent;`);
     }
   }
   return [
     '    # daaquan-locale-redirects',
     '    location = / {',
-    '        return 302 /ja/;',
+    '        return 302 https://daaquan.com/ja/;',
     '    }',
-    '    rewrite ^/notes/?$ /ja/notes/ permanent;',
-    '    rewrite ^/notes/(.+)$ /ja/notes/$1 permanent;',
+    '    rewrite ^/notes/?$ https://daaquan.com/ja/notes/ permanent;',
+    '    rewrite ^/notes/(.+)$ https://daaquan.com/ja/notes/$1 permanent;',
     ...aliases,
     '    # /daaquan-locale-redirects',
     '',
